@@ -1,0 +1,8 @@
+{
+  "name": "Web Designer Portfolio",
+  "description": "A professional, highly polished web designer portfolio website with rich interactive motion, project showcasing, contact system, and an admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
