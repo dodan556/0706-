@@ -36,8 +36,19 @@ if (isSupabaseConfigured) {
   }
 } else {
   console.warn(
-    'Supabase is not configured or is using placeholder credentials. File uploads will run in local/base64 demo mode.'
+    'Database is using default placeholder credentials. File uploads will run in local/base64 fallback mode.'
   );
 }
 
 export const supabase = supabaseInstance;
+
+
+console.log("SUPABASE URL:", supabaseUrl);
+console.log("SUPABASE KEY:", supabaseAnonKey ? "FOUND" : "MISSING");
+console.log("CONFIGURED:", isSupabaseConfigured);
+
+
+
+
+
+

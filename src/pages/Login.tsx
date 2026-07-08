@@ -3,19 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Lock, Mail, ArrowRight, AlertCircle, Shield } from 'lucide-react';
 import { authService } from '../services';
-import { isSupabaseConfigured } from '../lib/supabase';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@portfolio.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Redirect if session exists
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const user = await authService.getSession();
+        if (user) {
+          navigate('/admin');
+        }
+      } catch (err) {
+        console.error('Error checking active session:', err);
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +88,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  placeholder="admin@portfolio.com"
+                  placeholder="admin@email.com"
                   className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-white/10 focus:outline-none focus:border-[#f27d26] text-xs font-mono text-white placeholder:text-zinc-650 rounded-sm"
                 />
               </div>

@@ -63,28 +63,27 @@ export const projectsService = {
    * Fetches all projects from Supabase.
    */
   async getProjects(): Promise<Project[]> {
-    console.log('[projectsService.getProjects] isSupabaseConfigured:', isSupabaseConfigured);
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          throw new Error(`[Supabase Error] ${error.message} (${error.code})`);
-        }
-
-        console.log(`[projectsService.getProjects] Successfully fetched ${data?.length || 0} projects.`);
-        return (data || []).map(mapDbToUi);
-      } catch (err: any) {
-        console.error('[projectsService.getProjects] Failed to load projects from Supabase:', err);
-        throw err;
-      }
+    console.log('[projectsService.getProjects] Checking database client:', !!supabase);
+    if (!supabase) {
+      throw new Error('Database connection required.');
     }
 
-    console.warn('[projectsService.getProjects] Supabase is not configured.');
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`[Supabase Error] ${error.message} (${error.code})`);
+      }
+
+      console.log(`[projectsService.getProjects] Successfully fetched ${data?.length || 0} projects.`);
+      return (data || []).map(mapDbToUi);
+    } catch (err: any) {
+      console.error('[projectsService.getProjects] Failed to load projects from Supabase:', err);
+      throw err;
+    }
   },
 
   /**
@@ -92,30 +91,30 @@ export const projectsService = {
    */
   async getProjectById(id: string): Promise<Project | null> {
     console.log(`[projectsService.getProjectById] Fetching project with id: ${id}`);
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) {
-          if (error.code === 'PGRST116') {
-            console.warn(`[projectsService.getProjectById] Project not found in DB with id: ${id}`);
-            return null;
-          }
-          throw new Error(`[Supabase Error] ${error.message} (${error.code})`);
-        }
-
-        return data ? mapDbToUi(data) : null;
-      } catch (err: any) {
-        console.error(`[projectsService.getProjectById] Failed to load project with ID ${id} from Supabase:`, err);
-        throw err;
-      }
+    if (!supabase) {
+      throw new Error('Database connection required.');
     }
 
-    return null;
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.warn(`[projectsService.getProjectById] Project not found in DB with id: ${id}`);
+          return null;
+        }
+        throw new Error(`[Supabase Error] ${error.message} (${error.code})`);
+      }
+
+      return data ? mapDbToUi(data) : null;
+    } catch (err: any) {
+      console.error(`[projectsService.getProjectById] Failed to load project with ID ${id} from Supabase:`, err);
+      throw err;
+    }
   },
 
   /**
@@ -131,7 +130,7 @@ export const projectsService = {
       images: project.images || []
     };
 
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       try {
         const dbProject = mapUiToDb(completeProject);
         const { data, error } = await supabase
@@ -167,7 +166,7 @@ export const projectsService = {
       }
     }
 
-    throw new Error('Supabase is not configured. Cannot create project.');
+    throw new Error('Database connection is not active. Cannot create project.');
   },
 
   /**
@@ -175,7 +174,7 @@ export const projectsService = {
    */
   async updateProject(id: string, updates: Partial<Project>): Promise<Project> {
     console.log(`[projectsService.updateProject] Updating project with ID: ${id}`);
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       try {
         const dbUpdates: Partial<DatabaseProject> = {};
         if (updates.title !== undefined) dbUpdates.title = updates.title;
@@ -235,7 +234,7 @@ export const projectsService = {
       }
     }
 
-    throw new Error('Supabase is not configured. Cannot update project.');
+    throw new Error('Database connection is not active. Cannot update project.');
   },
 
   /**
@@ -243,7 +242,7 @@ export const projectsService = {
    */
   async deleteProject(id: string): Promise<boolean> {
     console.log(`[projectsService.deleteProject] 1. 삭제 버튼 클릭 후 삭제 서비스 진입. ID: "${id}"`);
-    if (isSupabaseConfigured && supabase) {
+    if (supabase) {
       try {
         console.log(`[projectsService.deleteProject] 4. Supabase delete() 요청 실행 시작`);
         
@@ -280,6 +279,6 @@ export const projectsService = {
       }
     }
 
-    throw new Error('Supabase is not configured. Cannot delete project.');
+    throw new Error('Database connection is not active. Cannot delete project.');
   }
 };
