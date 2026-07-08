@@ -140,9 +140,6 @@ export default function Admin() {
     authOk: false
   });
 
-  const [seedingLoading, setSeedingLoading] = useState(false);
-  const [seedingMessage, setSeedingMessage] = useState('');
-
   // Project Modal / Edit States
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -299,24 +296,6 @@ export default function Admin() {
     }
   };
 
-  const handleSeedDatabase = async () => {
-    setSeedingLoading(true);
-    setSeedingMessage('');
-    try {
-      const res = await projectsService.seedProjectsToSupabase();
-      if (res.success) {
-        setSeedingMessage(`SUCCESS: ${res.message} (${res.count} projects synchronized)`);
-        await loadAllData();
-      } else {
-        setSeedingMessage(`ERROR: ${res.message}`);
-      }
-    } catch (err: any) {
-      setSeedingMessage(`CATASTROPHIC FAILURE: ${err.message}`);
-    } finally {
-      setSeedingLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
     await authService.signOut();
     navigate('/');
@@ -461,7 +440,8 @@ export default function Admin() {
     try {
       const payload = {
         title: bioCardTitle,
-        description: bioCardDescription
+        description: bioCardDescription,
+        sortOrder: editingBioCard ? (editingBioCard.sortOrder ?? 0) : bioCards.length
       };
 
       if (editingBioCard?.id) {
@@ -1095,14 +1075,27 @@ export default function Admin() {
   const handleDeleteProject = async (id: string) => {
     if (!window.confirm('이 프로젝트를 영구적으로 삭제하시겠습니까?')) return;
     
+    console.log(`[handleDeleteProject] 1. 삭제 버튼 클릭 감지됨. 대상 ID: "${id}"`);
+    console.log(`[handleDeleteProject] 2. 삭제 함수 호출 시작`);
+    
     const originalProjects = [...projects];
+    // 8. React state 즉시 갱신 (Optimistic update)
     setProjects(prev => prev.filter(p => p.id !== id));
     
     try {
+      console.log(`[handleDeleteProject] 3. 삭제 대상 ID 정상 전달 확인: "${id}"`);
       await projectsService.deleteProject(id);
+      
       showCmsSuccess('Project successfully deleted from database.');
+      
+      // 7. 삭제 후 목록을 다시 조회(refetch)
+      console.log(`[handleDeleteProject] 7. 삭제 후 데이터베이스 목록 리페치 시작`);
+      const freshProjects = await projectsService.getProjects();
+      setProjects(freshProjects);
+      console.log(`[handleDeleteProject] 8. 리페치된 데이터로 React state 최종 갱신 완료.`);
     } catch (err: any) {
       console.error('[Delete Error] Failed to delete project:', err);
+      // 5. 삭제 실패 시 반드시 실제 error.message를 출력
       showCmsError('Failed to delete project: ' + (err.message || err));
       setProjects(originalProjects);
     }
@@ -1180,19 +1173,6 @@ export default function Admin() {
               >
                 {isTestingConnection ? 'TESTING HANDSHAKE...' : 'TEST HANDSHAKE'}
               </button>
-
-              <button
-                onClick={handleSeedDatabase}
-                disabled={seedingLoading || !isSupabaseConfigured}
-                className={`px-3 py-1.5 text-[9px] font-mono rounded-sm uppercase tracking-widest transition-all ${
-                  isSupabaseConfigured 
-                    ? 'bg-[#f27d26]/10 text-[#f27d26] hover:bg-[#f27d26]/20 border border-[#f27d26]/30' 
-                    : 'bg-zinc-950 border border-white/5 text-zinc-650 cursor-not-allowed'
-                }`}
-                title="If your Supabase database is connected but empty, click here to seed it with the portfolio items!"
-              >
-                {seedingLoading ? 'SEEDING DATABASE...' : 'SEED TABLES'}
-              </button>
             </div>
           </div>
 
@@ -1246,12 +1226,6 @@ export default function Admin() {
               )}
             </div>
           </div>
-
-          {seedingMessage && (
-            <div className="p-3 bg-zinc-950 border border-[#f27d26]/20 text-[10px] font-mono text-[#f27d26] rounded-sm uppercase tracking-wide">
-              {seedingMessage}
-            </div>
-          )}
         </div>
 
         {/* ================= INTERACTIVE TABS ================= */}
@@ -1425,8 +1399,8 @@ export default function Admin() {
               </div>
             ) : (
               <div className="text-center py-20 border border-dashed border-white/10 rounded-sm">
-                <p className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
-                  PORTFOLIO IS EMPTY. CLICK 'SEED TABLES' ABOVE OR 'ADD NEW WORK' TO START!
+                <p className="font-sans text-xs text-zinc-500 uppercase tracking-widest">
+                  등록된 프로젝트가 없습니다.
                 </p>
               </div>
             )}

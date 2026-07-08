@@ -20,8 +20,6 @@ import {
   DatabaseCertification, 
   DatabaseContactChannel 
 } from '../types/supabase';
-import { INITIAL_SKILLS } from '../lib/portfolioData';
-
 // --- Mappings ---
 function mapDbToUiHome(db: DatabaseHomeSettings): HomeSettings {
   return {
@@ -171,7 +169,14 @@ const DEFAULT_ABOUT: AboutSettings = {
   p3: '사용자가 쉽게 이해할 수 있는 타이포그래피 그리드, 정보의 구조화, 설득력 있는 비주얼 레이아웃을 연구하여 브랜드의 가치가 자연스럽게 녹아들고 매출과 전환으로 이어지는 결과를 이끌어냅니다.',
 };
 
-const DEFAULT_SKILLS: Skill[] = INITIAL_SKILLS.map((s, idx) => ({ ...s, sortOrder: idx }));
+const DEFAULT_SKILLS: Skill[] = [
+  { id: '1', name: 'UI/UX Design', category: 'design', level: 95, iconName: 'Layout', sortOrder: 0 },
+  { id: '2', name: 'Design Systems', category: 'design', level: 95, iconName: 'Grid', sortOrder: 1 },
+  { id: '3', name: 'React / Next.js', category: 'development', level: 85, iconName: 'Code', sortOrder: 2 },
+  { id: '4', name: 'Tailwind CSS', category: 'development', level: 95, iconName: 'Wind', sortOrder: 3 },
+  { id: '5', name: 'TypeScript', category: 'development', level: 80, iconName: 'Layers', sortOrder: 4 },
+  { id: '6', name: 'Figma', category: 'tools', level: 98, iconName: 'PenTool', sortOrder: 5 }
+];
 
 const DEFAULT_CERTS: Certification[] = [
   { id: '1', name: '정보처리기사 (Engineer Information Processing)', authority: 'Human Resources Development Service of Korea', date: '2015.06', code: 'License No. 15401050218U', sortOrder: 0 },

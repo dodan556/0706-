@@ -232,7 +232,17 @@ export default function Projects() {
             </div>
           ) : (
             <AnimatePresence mode="wait">
-              {paginatedProjects.length > 0 ? (
+              {projects.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-24 border border-dashed border-white/10 bg-[#070707] rounded-sm"
+                >
+                  <p className="font-sans text-xs uppercase tracking-[0.25em] text-zinc-500">
+                    등록된 프로젝트가 없습니다.
+                  </p>
+                </motion.div>
+              ) : paginatedProjects.length > 0 ? (
                 <motion.div 
                   layout
                   key={`${selectedCategory}-${sortBy}-${safeCurrentPage}-${searchQuery}-${projects.length}`}

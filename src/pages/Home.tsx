@@ -283,8 +283,8 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 border border-dashed border-white/5 rounded-sm font-mono text-zinc-500 text-xs uppercase tracking-widest">
-              Featured projects empty. Seed data in admin panel to visualize.
+            <div className="text-center py-12 border border-dashed border-white/5 rounded-sm font-sans text-zinc-500 text-xs uppercase tracking-widest">
+              등록된 프로젝트가 없습니다.
             </div>
           )}
         </div>

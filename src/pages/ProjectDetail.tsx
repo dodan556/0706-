@@ -27,43 +27,8 @@ import { Project } from '../types';
 interface ProgramInfo {
   name: string;
   role: string;
-  category: 'Design' | 'Development' | 'Creative' | 'Graphics' | 'Animation' | 'DevOps';
+  category: 'Design' | 'Development' | 'Creative' | 'Graphics' | 'Animation' | 'DevOps' | string;
 }
-
-// Dedicated tools mapper based on project ID for premium experience
-const PROJECT_PROGRAMS: Record<string, ProgramInfo[]> = {
-  '1': [
-    { name: 'Figma', role: 'UI/UX 디자인 및 고해상도 프로토타이핑', category: 'Design' },
-    { name: 'Visual Studio Code', role: '컴포넌트 개발 및 상태 관리 구현', category: 'Development' },
-    { name: 'Adobe Photoshop', role: '제품 이미지 가공 및 비주얼 리터칭', category: 'Creative' },
-    { name: 'Framer Motion', role: '정밀 인터랙션 및 프레임워크 트랜지션', category: 'Animation' }
-  ],
-  '2': [
-    { name: 'Figma', role: '비정형 레이아웃 오가닉 설계', category: 'Design' },
-    { name: 'Visual Studio Code', role: 'WebGL 연동 프론트엔드 최적화', category: 'Development' },
-    { name: 'Three.js / WebGL', role: '실시간 3D 그래픽 렌더링 파이프라인', category: 'Graphics' },
-    { name: 'Blender', role: '가상 미술관 3D 오브젝트 에셋 모델링', category: 'Creative' }
-  ],
-  '3': [
-    { name: 'Figma', role: '디자인 시스템 아토믹 컴포넌트 토큰 설계', category: 'Design' },
-    { name: 'Storybook', role: '독립형 컴포넌트 샌드박스 테스팅', category: 'Development' },
-    { name: 'Visual Studio Code', role: 'Tailwind 기반 유틸리티 CSS 컴포넌팅', category: 'Development' },
-    { name: 'GitHub Workspace', role: '버전 관리 및 배포 자동화 파이프라인', category: 'DevOps' }
-  ],
-  '4': [
-    { name: 'Figma', role: '뉴모피즘 오디오 데크 GUI 설계', category: 'Design' },
-    { name: 'Visual Studio Code', role: 'Web Audio API 핵심 제어 로직 설계', category: 'Development' },
-    { name: 'Adobe Audition', role: '공간 음향 입체 오디오 음원 엔지니어링', category: 'Creative' },
-    { name: 'Blender', role: '다이얼 노브 질감 메탈릭 매핑 렌더링', category: 'Creative' }
-  ]
-};
-
-// Default program list fallback
-const DEFAULT_PROGRAMS: ProgramInfo[] = [
-  { name: 'Figma', role: '제품 인터페이스 & 컴포넌트 기획', category: 'Design' },
-  { name: 'Visual Studio Code', role: '프로토타입 애플리케이션 프론트엔드 빌드', category: 'Development' },
-  { name: 'GitHub', role: '오픈소스 형상 관리 및 빌드 파이프라인', category: 'DevOps' }
-];
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -191,7 +156,7 @@ export default function ProjectDetail() {
   // Get mapped programs from database or fallback
   const softwarePrograms = project.softwarePrograms && project.softwarePrograms.length > 0 
     ? project.softwarePrograms 
-    : DEFAULT_PROGRAMS;
+    : [];
 
   return (
     <article className="pt-28 pb-24 px-6 bg-[#050505] text-white min-h-screen font-sans overflow-hidden">
