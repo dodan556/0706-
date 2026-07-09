@@ -6,3 +6,5 @@
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
 }
+console.log("SUPABASE URL =", supabaseUrl);
+console.log("SUPABASE CONFIGURED =", isSupabaseConfigured);
